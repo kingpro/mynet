@@ -58,12 +58,13 @@ func (p *SimpleProtocol) Write(w io.Writer, b []byte, buf []byte) error {
 		return errors.New("send packet too large")
 	}
 
-	if cap(buf) < n+4 {
-		buf = make([]byte, n+4)
+	packn := n + 4
+	if cap(buf) < packn {
+		buf = make([]byte, packn)
 	}
 
 	binary.BigEndian.PutUint32(buf[0:4], uint32(n))
-	copy(buf[4:4+n], b)
-	_, err := w.Write(buf[:4+n])
+	copy(buf[4:packn], b)
+	_, err := w.Write(buf[:packn])
 	return err
 }

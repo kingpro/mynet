@@ -64,22 +64,23 @@ func (server *Server) Run() {
 			break
 		}
 
-		if len(server.conns) > server.config.MaxConn {
-			continue
-		}
-
-		linkId++
-		c := NewConn(server, linkId, conn, server.protocol, 10)
-		server.putConn(c)
-		go c.readLoop()
+		server.newConn(conn)
 	}
 }
 
-func (server *Server) putConn(c *Conn) {
+func (server *Server) newConn(conn net.Conn) {
 	server.mu.Lock()
 	defer server.mu.Unlock()
 
+	if len(server.conns) > server.config.MaxConn {
+		Log.Info("maximum connection limit", conn.RemoteAddr())
+		return
+	}
+
+	linkId++
+	c := NewConn(server, linkId, conn, server.protocol, 32)
 	server.conns[c.Id()] = c
+	go c.readLoop()
 }
 
 func (server *Server) delConn(c *Conn) {

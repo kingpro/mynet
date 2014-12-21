@@ -22,16 +22,17 @@ func DialTimeout(network string, address string, timeout time.Duration, p Protoc
 	return c, nil
 }
 
-func (c *Client) ReadLoop(handler func(b []byte)) {
+func (c *Client) ReadLoop(handle func(b []byte), handleErr func(err error)) {
 	defer Recover()
 
 	buf := make([]byte, 2048)
 	for {
 		n, err := c.protocol.Read(c.conn, buf)
 		if err != nil {
+			handleErr(err)
 			break
 		}
-		handler(buf[:n])
+		handle(buf[:n])
 	}
 }
 

@@ -13,7 +13,8 @@ func main() {
 		MaxConn: 100,
 		Logger:  log.New(os.Stdout, "", 0),
 	}
-	server := mynet.NewServer(config, NewService(), mynet.NewSimpleProtocol(1024, 1024))
+	protocol := mynet.NewSimpleProtocol(1024, 1024)
+	server := mynet.NewServer(config, NewService(), protocol)
 	server.Run()
 }
 

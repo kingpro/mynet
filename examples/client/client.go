@@ -24,10 +24,11 @@ func main() {
 		mynet.NewSimpleProtocol(1024, 1024),
 	)
 	if err != nil {
-		panic(err.Error())
+		log.Println(err.Error())
+		return
 	}
 
-	go client.ReadLoop(handler)
+	go client.ReadLoop(handle, handleErr)
 
 	rd := bufio.NewReader(os.Stdin)
 	for {
@@ -36,12 +37,17 @@ func main() {
 			break
 		}
 		err = send(l)
-		log.Println("send msg", string(l), err)
+		log.Println("send msg:", string(l), err)
 	}
 }
 
-func handler(b []byte) {
-	log.Println("get msg", string(b))
+func handle(b []byte) {
+	log.Println("get msg:", string(b))
+}
+
+func handleErr(err error) {
+	log.Println("err", err.Error())
+	os.Exit(-1)
 }
 
 func send(b []byte) error {
