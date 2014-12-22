@@ -44,6 +44,8 @@ func (c *Conn) read(buf []byte) (n int, err error) {
 func (c *Conn) readLoop() {
 	defer Recover()
 
+	c.conn.SetDeadline(time.Now().Add(c.server.config.DeadlineTime))
+
 	Log.Info("new conn id=%d", c.id)
 
 	buf := make([]byte, 2048)

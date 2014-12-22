@@ -5,12 +5,14 @@ import (
 	"net"
 	"runtime"
 	"sync"
+	"time"
 )
 
 type Config struct {
-	Addr    string
-	MaxConn int
-	Logger  *log.Logger
+	Addr         string
+	MaxConn      int
+	Logger       *log.Logger
+	DeadlineTime time.Duration
 }
 
 type Server struct {

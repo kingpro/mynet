@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/soki/mynet"
 	"log"
-	"mynet"
 	"os"
 	"time"
 )

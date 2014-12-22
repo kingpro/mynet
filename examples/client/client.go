@@ -2,8 +2,8 @@ package main
 
 import (
 	"bufio"
+	"github.com/soki/mynet"
 	"log"
-	"mynet"
 	"os"
 	"time"
 )
