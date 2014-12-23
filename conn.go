@@ -19,6 +19,11 @@ type Conn struct {
 	closeFlag int32
 }
 
+var (
+	readBufSize  int = 2048
+	writeBufSize int = 8192
+)
+
 func NewConn(server *Server, id uint64, conn net.Conn, p Protocol, sendChSize int) *Conn {
 	c := &Conn{
 		server:    server,
@@ -44,11 +49,9 @@ func (c *Conn) read(buf []byte) (n int, err error) {
 func (c *Conn) readLoop() {
 	defer Recover()
 
-	c.conn.SetDeadline(time.Now().Add(c.server.config.DeadlineTime))
-
 	Log.Info("new conn id=%d", c.id)
 
-	buf := make([]byte, 2048)
+	buf := make([]byte, readBufSize)
 	for {
 		n, err := c.read(buf)
 		if err != nil {
@@ -60,6 +63,10 @@ func (c *Conn) readLoop() {
 }
 
 func (c *Conn) Send(b []byte, timeout time.Duration) error {
+	if c.IsClosed() {
+		return errors.New("conn close")
+	}
+
 	select {
 	case c.sendChan <- b:
 	case <-time.After(timeout):
@@ -73,7 +80,7 @@ func (c *Conn) send(msg []byte, buf []byte) error {
 }
 
 func (c *Conn) sendLoop() {
-	buf := make([]byte, 32768)
+	buf := make([]byte, writeBufSize)
 	for {
 		select {
 		case msg := <-c.sendChan:
@@ -86,6 +93,10 @@ func (c *Conn) sendLoop() {
 			return
 		}
 	}
+}
+
+func (c *Conn) IsClosed() bool {
+	return atomic.LoadInt32(&c.closeFlag) == 1
 }
 
 func (c *Conn) Close(err error) {
