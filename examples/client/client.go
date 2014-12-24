@@ -21,7 +21,7 @@ func main() {
 		"tcp",
 		"127.0.0.1:8760",
 		time.Duration(100*time.Millisecond),
-		mynet.NewSimpleProtocol(1024, 1024),
+		mynet.NewSimpleProtocol(1024, 1024, 4),
 	)
 	if err != nil {
 		log.Println(err.Error())
